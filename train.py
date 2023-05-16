@@ -272,4 +272,5 @@ while True:
     if algo.n_steps >= args.steps:
         break
     log = algo.train(env, model, opt, n_steps_lim=(n_train + 1) * args.eval_interval)
+    torch.save(algo.model.state_dict(), f"params/{args.game}_n_steps_{algo.n_steps}_ent_coef_{args.ent_coef}.pt")
     n_train += 1
