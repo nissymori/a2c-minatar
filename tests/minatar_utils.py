@@ -136,18 +136,17 @@ class ACNetwork(nn.Module):
         return self.policy(x), self.value(x)
 
 
-def load_model(model_file_path, minarar_env):
-    model = ACNetwork(env.num_channels, env.num_actions, args.game)
+def load_model(model_file_path, minarar_env, game):
+    model = ACNetwork(minarar_env.n_channels, len(minarar_env.minimal_action_set()), game)
     model.load_state_dict(torch.load(model_file_path))
     model.eval()
     return model
 
 
-def act(model, minatar_state, deterministic=False):
-    obs = minatar_state.state()
+def act(model, obs, deterministic=False):
     obs = torch.from_numpy(obs).float().unsqueeze(0)
-    probs, _ = model(obs)
-    m = Categorical(probs)
+    logits, _ = model(obs)
+    m = Categorical(logits=logits)
     action = m.sample() if not deterministic else m.probs.argmax()
     return action.item()
 

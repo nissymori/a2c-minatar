@@ -1,11 +1,13 @@
 import random
 import jax
+import os
+import time
 
 from minatar import Environment
 
 from pgx.minatar import freeway
 
-from .minatar_utils import *
+from minatar_utils import *
 
 state_keys = [
     "cars",
@@ -30,7 +32,7 @@ def test_step_det(model):
         done = False
         while not done:
             s = extract_state(env, state_keys)
-            a = act(model, s)
+            a = act(model, env.state())
             r, done = env.act(a)
             # extract random variables
             speeds, directions = jnp.array(env.env.speeds), jnp.array(
@@ -77,7 +79,7 @@ def test_observe(model):
                 env.state(),
                 obs_pgx,
             )
-            a = act(model, s)
+            a = act(model, env.state())
             r, done = env.act(a)
 
         # check terminal state
@@ -108,13 +110,15 @@ if __name__ == "__main__":
     print(f"start testing freeway")
     for filename in os.listdir(param_dir):
         name, _ = filename.split(".")
+        if "space_invaders" in name:
+            continue
         game, _, _, step_num, _, _, ent_coef = name.split("_")
         if not game == "freeway":
             continue
         print(f"start testing with model n_steps{str(step_num)} ent_coef{str(ent_coef)}")
         sta = time.time()
         filepath = os.path.join(param_dir, filename)
-        model = load_model(filepath, env)
+        model = load_model(filepath, env, game)
         test_step_det(model)
         test_observe(model)
         end = time.time()

@@ -6,7 +6,7 @@ from minatar import Environment
 
 from pgx.minatar import space_invaders
 
-from .minatar_utils import *
+from minatar_utils import *
 
 state_keys = [
     "pos",
@@ -46,7 +46,7 @@ def test_step_det():
         done = False
         while not done:
             s = extract_state(env, state_keys)
-            a = act(model, s)
+            a = act(model, env.state())
             r, done = env.act(a)
             s_next = extract_state(env, state_keys)
             s_next_pgx = _step_det(
@@ -84,7 +84,7 @@ def test_observe(model):
                 env.state(),
                 obs_pgx,
             )
-            a = act(model, s)
+            a = act(model, env.state())
             r, done = env.act(a)
 
         # check terminal state
@@ -115,13 +115,15 @@ if __name__ == "__main__":
     print(f"start testing space_invadors")
     for filename in os.listdir(param_dir):
         name, _ = filename.split(".")
-        game, _, _, step_num, _, _, ent_coef = name.split("_")
-        if not game == "space_invaders":
+        _, _,  _, _, step_num, _, _, ent_coef = name.split("_")
+        if not "space_invaders" in name:
             continue
+        else:
+            game="space_invaders"
         print(f"start testing with model n_steps{str(step_num)} ent_coef{str(ent_coef)}")
         sta = time.time()
         filepath = os.path.join(param_dir, filename)
-        model = load_model(filepath, env)
+        model = load_model(filepath, env, game)
         test_step_det(model)
         test_observe(model)
         end = time.time()
