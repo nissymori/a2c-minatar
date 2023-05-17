@@ -241,8 +241,8 @@ def evaluate(
 
 args = MinAtarConfig(**OmegaConf.to_object(OmegaConf.from_cli()))
 print(args)
-
-wandb.init(project=f"a2c-minatar", config=args.dict())
+wandb.login(key="483ca3866ab4eaa8f523bacae3cb603d27d69c3d")
+wandb.init(project=f"a2c-minatar-v1", config=args.dict())
 
 
 # fix seeds
@@ -272,5 +272,5 @@ while True:
     if algo.n_steps >= args.steps:
         break
     log = algo.train(env, model, opt, n_steps_lim=(n_train + 1) * args.eval_interval)
-    torch.save(algo.model.state_dict(), f"params/{args.game}_n_steps_{algo.n_steps}_ent_coef_{args.ent_coef}.pt")
+    torch.save(model.state_dict(), f"params/{args.game}_n_steps_{algo.n_steps}_ent_coef_{args.ent_coef}.pt")
     n_train += 1
