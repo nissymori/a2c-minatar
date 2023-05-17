@@ -44,6 +44,7 @@ def test_step_det(model):
     for _ in range(N):
         env.reset()
         done = False
+        R = 0
         while not done:
             s = extract_state(env, state_keys)
             a = act(model, env.state())
@@ -68,6 +69,8 @@ def test_step_det(model):
             #     assert False
             assert r == s_next_pgx.rewards[0]
             assert done == s_next_pgx.terminated
+            R += r
+    return R/N
 
 
 def test_init_det():

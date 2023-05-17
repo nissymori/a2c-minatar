@@ -47,6 +47,7 @@ def test_step_det(model):
     num_actions = env.num_actions()
 
     N = 10
+    R = 0
     for _ in range(N):
         env.reset()
         done = False
@@ -66,6 +67,8 @@ def test_step_det(model):
             assert_states(s_next, pgx2minatar(s_next_pgx, state_keys))
             assert r == s_next_pgx.rewards[0]
             assert done == s_next_pgx.terminated
+            R += r
+    return R/N
 
 
 def test_observe(model):
@@ -123,8 +126,8 @@ if __name__ == "__main__":
         sta = time.time()
         filepath = os.path.join(param_dir, filename)
         model = load_model(filepath, env, game)
-        test_step_det(model)
+        average_return = test_step_det(model)
         test_observe(model)
         end = time.time()
-        print(f"finish testing with model n_steps{str(step_num)} ent_coef{str(ent_coef)} in {end - sta} seconds")
+        print(f"finish testing with model n_steps{str(step_num)} ent_coef{str(ent_coef)} with average return {average_return} in {end - sta} seconds")
     print("all tests passed")

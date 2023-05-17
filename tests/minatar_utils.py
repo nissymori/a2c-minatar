@@ -144,6 +144,7 @@ def load_model(model_file_path, minarar_env, game):
 
 
 def act(model, obs, deterministic=False):
+    obs = np.array(obs, np.int8).transpose(2, 0, 1).flatten()
     obs = torch.from_numpy(obs).float().unsqueeze(0)
     logits, _ = model(obs)
     m = Categorical(logits=logits)
